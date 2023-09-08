@@ -1,0 +1,97 @@
+package main
+
+import (
+	"fmt"
+	"math/rand"
+)
+
+type MaxHeap struct {
+	array []int
+}
+
+func (h *MaxHeap) Insert(val int) {
+	h.array = append(h.array, val)
+	h.maxHeapifyUp(len(h.array) - 1)
+}
+
+func (h *MaxHeap) Extract() int {
+	if len(h.array) == 0 {
+		fmt.Println("The heap is empty")
+		return -1
+	}
+
+	lastIdx := len(h.array) - 1
+
+	r := h.array[0]
+	h.array[0] = h.array[lastIdx]
+	h.array = h.array[:lastIdx]
+
+	h.maxHeapifyDown(0)
+
+	return r
+}
+
+func (h *MaxHeap) maxHeapifyUp(i int) {
+	for h.array[parent(i)] < h.array[i] {
+		h.swap(parent(i), i)
+		i = parent(i)
+	}
+}
+
+func (h *MaxHeap) maxHeapifyDown(i int) {
+	lastIdx := len(h.array) - 1
+	lIdx, rIdx := left(i), right(i)
+	chToCompIdx := 0
+
+	// loop until parent has at least one child
+	for lIdx <= lastIdx {
+		// Decide on child to compare
+		if lIdx == lastIdx {
+			chToCompIdx = lIdx
+		} else if h.array[lIdx] > h.array[rIdx] {
+			chToCompIdx = lIdx
+		} else {
+			chToCompIdx = rIdx
+		}
+
+		// Swap
+		if h.array[i] < h.array[chToCompIdx] {
+			h.swap(i, chToCompIdx)
+			i = chToCompIdx
+			lIdx, rIdx = left(i), right(i)
+		} else {
+			return
+		}
+	}
+
+}
+
+func (h *MaxHeap) swap(i1, i2 int) {
+	h.array[i1], h.array[i2] = h.array[i2], h.array[i1]
+}
+
+func parent(i int) int {
+	return (i - 1) / 2
+}
+
+func left(i int) int {
+	return 2*i + 1
+}
+
+func right(i int) int {
+	return 2*i + 2
+}
+
+func main() {
+	h := &MaxHeap{}
+
+	for _, v := range rand.Perm(12) {
+		h.Insert(v)
+		fmt.Println(h.array)
+	}
+
+	for i := 0; i < 5; i++ {
+		h.Extract()
+		fmt.Println(h.array)
+	}
+}

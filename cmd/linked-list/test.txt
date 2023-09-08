@@ -1,0 +1,95 @@
+package main
+
+import "fmt"
+
+type node struct {
+	data int
+	next *node
+}
+
+type linkedList struct {
+	head   *node
+	length int
+}
+
+func newNode(data int, next *node) *node {
+	return &node{data, next}
+}
+
+func newLinkedList() *linkedList {
+	return &linkedList{}
+}
+
+func (l *linkedList) prependByValue(data int) {
+	l.head = newNode(data, l.head)
+	l.length++
+}
+
+func traverseLinkedLIst(head *node) {
+	for head != nil {
+		fmt.Println(head.data)
+		head = head.next
+	}
+}
+
+func revereseLinkedListItt(head *node) *node {
+	var pre, cur, next *node = nil, head, nil
+
+	for cur != nil {
+		next = cur.next
+		cur.next = pre
+		pre = cur
+		cur = next
+	}
+
+	return pre
+}
+
+func revereseLinkedListRec(head *node) *node {
+	//stopper
+	if head == nil || head.next == nil {
+		return head
+	}
+
+	r := revereseLinkedListRec(head.next)
+	head.next.next = head // FIRST MOVE HEAD 2 PLACES
+	head.next = nil       // THEN BREAK THE BOND WITH THE NEW PREVIOUS NODE.. WHEN DOING THIS ON ALL THE NODES RECURSIVELY YOU WOULD REVERSE THE LINKED LIST
+	return r
+}
+
+func (l *linkedList) removeNodeByValue(value int) {
+	if l.head.data == value {
+		l.head = l.head.next
+		l.length--
+		return
+	}
+
+	// we can do this loop with if statement within the for loop but imo this is cleaner code
+	previousToDelete := l.head
+	for previousToDelete.next.data != value {
+		previousToDelete = previousToDelete.next
+	}
+	previousToDelete.next = previousToDelete.next.next
+	l.length--
+}
+
+func main() {
+	myLL := newLinkedList()
+	for i := 1; i < 6; i++ {
+		myLL.prependByValue(i)
+	}
+	traverseLinkedLIst(myLL.head)
+	fmt.Println("Reverse by iteration!")
+	myLL.head = revereseLinkedListItt(myLL.head)
+	traverseLinkedLIst(myLL.head)
+	fmt.Println("Reverse with recursion!")
+	myLL.head = revereseLinkedListRec(myLL.head)
+	traverseLinkedLIst(myLL.head)
+	fmt.Println("Remove node with value 3!")
+	myLL.removeNodeByValue(3)
+	traverseLinkedLIst(myLL.head)
+	fmt.Println("Remove node with value 5 - the current head!")
+	myLL.removeNodeByValue(5)
+	traverseLinkedLIst(myLL.head)
+
+}
